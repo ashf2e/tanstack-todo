@@ -1,10 +1,31 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import {
+  HeadContent,
+  Scripts,
+  createRootRoute,
+  createRootRouteWithContext,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import appCss from '../styles.css?url'
+import { getTodos } from '#/server/todo'
 
-export const Route = createRootRoute({
+interface MyRouterContext {
+  ash: Number
+  oj: { id: string }
+}
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
+  beforeLoad: async () => {
+    console.log('before load', 'before load')
+    const todoCookie = await getTodos()
+    return {
+      cookies: {
+        todo: todoCookie,
+      },
+    }
+  },
+
   head: () => ({
     meta: [
       {

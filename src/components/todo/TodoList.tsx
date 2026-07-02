@@ -1,5 +1,5 @@
-import type { Todo } from "#/types/todo"
-import { TodoItem } from "./TodoItem"
+import type { Todo } from '#/types/todo'
+import { TodoItem } from './TodoItem'
 
 interface Props {
   todos: Todo[]
@@ -8,19 +8,17 @@ interface Props {
   onDelete: (id: string) => void
 }
 
-export const TodoList = ({
-  todos,
-  onToggle,
-  onDelete
-}: Props) => {
+export const TodoList = ({ todos, onToggle, onDelete }: Props) => {
   if (todos.length === 0) {
     return (
-      <p className="text-gray-500">No todos</p>
+      <div className="py-2 min-h-20 flex items-center justify-center">
+        <p className="text-gray-500 text-4xl">No todos</p>
+      </div>
     )
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="py-2 space-y-2 flex flex-col">
       {todos.map((todo) => (
         <TodoItem
           key={todo.id}
@@ -32,4 +30,3 @@ export const TodoList = ({
     </ul>
   )
 }
-

@@ -10,11 +10,23 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TodosRouteImport } from './routes/todos'
+import { Route as ReactFormtwoRouteImport } from './routes/reactFormtwo'
+import { Route as ReactFormRouteImport } from './routes/reactForm'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TodosRoute = TodosRouteImport.update({
   id: '/todos',
   path: '/todos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReactFormtwoRoute = ReactFormtwoRouteImport.update({
+  id: '/reactFormtwo',
+  path: '/reactFormtwo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReactFormRoute = ReactFormRouteImport.update({
+  id: '/reactForm',
+  path: '/reactForm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,27 +37,35 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/reactForm': typeof ReactFormRoute
+  '/reactFormtwo': typeof ReactFormtwoRoute
   '/todos': typeof TodosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/reactForm': typeof ReactFormRoute
+  '/reactFormtwo': typeof ReactFormtwoRoute
   '/todos': typeof TodosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/reactForm': typeof ReactFormRoute
+  '/reactFormtwo': typeof ReactFormtwoRoute
   '/todos': typeof TodosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/todos'
+  fullPaths: '/' | '/reactForm' | '/reactFormtwo' | '/todos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/todos'
-  id: '__root__' | '/' | '/todos'
+  to: '/' | '/reactForm' | '/reactFormtwo' | '/todos'
+  id: '__root__' | '/' | '/reactForm' | '/reactFormtwo' | '/todos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ReactFormRoute: typeof ReactFormRoute
+  ReactFormtwoRoute: typeof ReactFormtwoRoute
   TodosRoute: typeof TodosRoute
 }
 
@@ -56,6 +76,20 @@ declare module '@tanstack/react-router' {
       path: '/todos'
       fullPath: '/todos'
       preLoaderRoute: typeof TodosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reactFormtwo': {
+      id: '/reactFormtwo'
+      path: '/reactFormtwo'
+      fullPath: '/reactFormtwo'
+      preLoaderRoute: typeof ReactFormtwoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reactForm': {
+      id: '/reactForm'
+      path: '/reactForm'
+      fullPath: '/reactForm'
+      preLoaderRoute: typeof ReactFormRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,6 +104,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ReactFormRoute: ReactFormRoute,
+  ReactFormtwoRoute: ReactFormtwoRoute,
   TodosRoute: TodosRoute,
 }
 export const routeTree = rootRouteImport

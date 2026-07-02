@@ -7,6 +7,10 @@ export function getRouter() {
     scrollRestoration: true,
     defaultPreload: 'intent',
     defaultPreloadStaleTime: 0,
+    context: {
+      ash: 1,
+      oj: { id: 'd' },
+    },
   })
 
   return router

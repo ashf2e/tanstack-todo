@@ -1,30 +1,30 @@
 import { createFileRoute } from '@tanstack/react-router'
-import {
-  useMemo,
-  useState
-} from 'react'
+import { useMemo, useState } from 'react'
 import type { Todo } from '#/types/todo'
-import {
-  TodoInput,
-  TodoList,
-  TodoToolbar
-} from '#/components/todo'
+import { TodoInput, TodoList, TodoToolbar } from '#/components/todo'
 
-import {
-  getTodos,
-  saveTodos
-} from '#/server/todo'
+import { saveTodos } from '#/server/todo'
+import { cn } from '#/lib/utils'
+import { useServerFn } from '@tanstack/react-start'
 
 export const Route = createFileRoute('/todos')({
-  validateSearch: (
-    search: Record<string, unknown>
-  ) => ({
+  validateSearch: (search: Record<string, unknown>) => ({
     q: typeof search.q === 'string' ? search.q : '',
-    filter: search.filter === 'active' || search.filter === 'completed' ? search.filter : 'all',
-    sort: search.sort === 'oldest' || search.sort === 'az' ? search.sort : 'newest'
+    filter:
+      search.filter === 'active' || search.filter === 'completed'
+        ? search.filter
+        : 'all',
+    sort:
+      search.sort === 'oldest' || search.sort === 'az' ? search.sort : 'newest',
   }),
-  loader: async () => {
-    return await getTodos()
+
+  loader: async ({ context }) => {
+    const { cookies } = context
+    const { todo } = cookies
+
+    console.log('context', context)
+
+    return todo
   },
   component: TodoPage,
 })
@@ -38,12 +38,14 @@ function TodoPage() {
 
   const [todos, setTodos] = useState<Todo[]>(initialTodos)
 
+  // 有在 serverFn 用到 redirect 等需要包，建議需要用都包
+  const serverTodoAction = useServerFn(saveTodos)
   const updateTodos = async (nextTodos: Todo[]) => {
     setTodos(nextTodos)
 
     try {
-      await saveTodos({
-        data: nextTodos
+      await serverTodoAction({
+        data: nextTodos,
       })
     } catch (error) {
       console.error(error)
@@ -55,7 +57,7 @@ function TodoPage() {
       id: crypto.randomUUID(),
       text,
       completed: false,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     }
 
     await updateTodos([...todos, newTodo])
@@ -69,7 +71,7 @@ function TodoPage() {
 
       return {
         ...todo,
-        completed: !todo.completed
+        completed: !todo.completed,
       }
     })
 
@@ -85,7 +87,9 @@ function TodoPage() {
   const visibleTodos = useMemo(() => {
     let result = [...todos]
 
-    result = result.filter((todo) => todo.text.toLowerCase().includes(search.q.toLowerCase()))
+    result = result.filter((todo) =>
+      todo.text.toLowerCase().includes(search.q.toLowerCase()),
+    )
 
     if (search.filter === 'active') {
       result = result.filter((todo) => !todo.completed)
@@ -110,38 +114,40 @@ function TodoPage() {
     return result
   }, [todos, search])
 
-
   return (
-    <div>
-      <h1>Todo List</h1>
+    <div className={cn('min-h-screen', 'bg-zinc-950', 'text-zinc-100')}>
+      <div className={cn('max-w-2xl', 'mx-auto', 'px-4 py-12')}>
+        <h1>Todo List</h1>
 
-      <TodoInput
-        onAdd={handleAddTodo}
-      />
+        <TodoInput onAdd={handleAddTodo} />
 
-      <TodoToolbar
-        q={search.q}
-        filter={search.filter}
-        sort={search.sort}
-        onSearch={(value) => navigate({
-          to: '/todos',
-          search: (prev) => ({ ...prev, q: value })
-        })}
-        onFilterChnage={(value) => navigate({
-          to: '/todos',
-          search: (prev) => ({ ...prev, filter: value })
-        })}
-        onSortChange={(value) => navigate({
-          to: '/todos',
-          search: (prev) => ({ ...prev, sort: value })
-        })}
-      />
+        <TodoToolbar
+          q={search.q}
+          filter={search.filter}
+          sort={search.sort}
+          onSearch={(value) =>
+            navigate({
+              search: (prev) => ({ ...prev, q: value }),
+            })
+          }
+          onFilterChnage={(value) =>
+            navigate({
+              search: (prev) => ({ ...prev, filter: value }),
+            })
+          }
+          onSortChange={(value) =>
+            navigate({
+              search: (prev) => ({ ...prev, sort: value }),
+            })
+          }
+        />
 
-      <TodoList
-        todos={visibleTodos}
-        onToggle={handleToggleTodo}
-        onDelete={handleDeleteTodo}
-      />
+        <TodoList
+          todos={visibleTodos}
+          onToggle={handleToggleTodo}
+          onDelete={handleDeleteTodo}
+        />
+      </div>
     </div>
   )
 }

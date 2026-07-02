@@ -1,4 +1,4 @@
-import { cn } from "#/lib/utils"
+import { cn } from '#/lib/utils'
 
 interface Props {
   q: string
@@ -12,18 +12,13 @@ interface Props {
 
 export const TodoToolbar = (props: Props) => {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2">
       <input
         type="text"
         value={props.q}
         onChange={(e) => props.onSearch(e.target.value)}
         placeholder="Search..."
-        className={cn(
-          "border",
-          "rounded",
-          "px-3 py-2",
-          "w-full"
-        )}
+        className={cn('border', 'rounded', 'px-3 py-2', 'w-full')}
       />
 
       <div className="flex gap-2">
