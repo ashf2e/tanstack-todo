@@ -1,11 +1,12 @@
 import { cn } from '#/lib/utils'
-import type { Field, FormValue } from './types'
+import type { Field } from './types'
+import { FileUpload } from './FileUpload'
 
 type Props = {
   field: Field
-  form: FormValue
+  form: Record<string, unknown>
   updateField: (
-    name: keyof FormValue,
+    name: string,
     value: string | string[] | boolean | File | null,
   ) => void
 }
@@ -92,6 +93,7 @@ export function FormField({ field, form, updateField }: Props) {
       )
 
     case 'checkbox-group':
+      const values = form[field.name] as string[]
       return (
         <div className="space-y-2">
           <div className="text-sm font-medium">{field.label}</div>
@@ -101,14 +103,14 @@ export function FormField({ field, form, updateField }: Props) {
               <label key={option.value} className={optionInputClass}>
                 <input
                   type="checkbox"
-                  checked={form.skills.includes(option.value)}
+                  checked={values.includes(option.value)}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      updateField('skills', [...form.skills, option.value])
+                      updateField(field.name, [...values, option.value])
                     } else {
                       updateField(
-                        'skills',
-                        form.skills.filter((item) => item !== option.value),
+                        field.name,
+                        values.filter((item) => item !== option.value),
                       )
                     }
                   }}
@@ -135,9 +137,16 @@ export function FormField({ field, form, updateField }: Props) {
       )
 
     case 'file':
+      const file = form[field.name] as File | null
       return (
         <div className="space-y-2">
-          <label className="flex h-36 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed hover:border-blue-500">
+          <label className="block text-sm font-medium">{field.label}</label>
+          <FileUpload
+            value={form[field.name] as File | null}
+            onChange={(file) => updateField(field.name, file)}
+          />
+
+          {/* <label className="flex h-36 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed hover:border-blue-500">
             <input
               hidden
               type="file"
@@ -146,8 +155,8 @@ export function FormField({ field, form, updateField }: Props) {
               }
             />
 
-            {form.resume ? form.resume.name : '點擊上傳履歷'}
-          </label>
+            {file ? file.name : '點擊上傳履歷'}
+          </label> */}
         </div>
       )
 

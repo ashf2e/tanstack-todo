@@ -6,6 +6,14 @@ import { submitForm } from '#/server/submit-form'
 import { useForm } from '@/hooks/useForm'
 import { formSteps } from '@/lib/formSteps'
 import { FormField } from '@/components/form/FormField'
+import { FormSummary } from '@/components/form/FormSummary'
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 
 export const Route = createFileRoute('/reactFormtwo')({
   component: RouteComponent,
@@ -18,6 +26,8 @@ function RouteComponent() {
   const [stepStatus, setStepStatus] = useState<
     Record<number, 'complete' | 'error' | 'idle'>
   >({})
+
+  const [summaryOpen, setSummaryOpen] = useState(false)
 
   const { form, updateField } = useForm()
 
@@ -50,6 +60,10 @@ function RouteComponent() {
       })
 
       console.log(result)
+
+      if (result.success) {
+        setSummaryOpen(true)
+      }
     } catch (error) {
       console.error(error)
     } finally {
@@ -244,6 +258,16 @@ function RouteComponent() {
           )}
         </div>
       </div>
+
+      <Dialog open={summaryOpen} onOpenChange={setSummaryOpen}>
+        <DialogContent className="max-h-[80vh] max-w-3xl overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>表單送出成功</DialogTitle>
+          </DialogHeader>
+
+          <FormSummary form={form} steps={formSteps} />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
