@@ -1,6 +1,12 @@
-import { cn } from '#/lib/utils'
 import type { Field } from './types'
-import { FileUpload } from './FileUpload'
+
+import { TextField } from './fields/TextField'
+import { TextareaField } from './fields/TextareaField'
+import { SelectField } from './fields/SelectField'
+import { RadioField } from './fields/RadioField'
+import { FileField } from './fields/FileField'
+import { CheckboxField } from './fields/CheckboxField'
+import { CheckboxGroupField } from './fields/CheckboxGroupField'
 
 type Props = {
   field: Field
@@ -11,156 +17,78 @@ type Props = {
   ) => void
 }
 
-const textInputClass = cn(
-  'w-full rounded-lg border px-3 py-2 outline-none transition focus:border-blue-500',
-)
+export const FormField = ({ field, form, updateField }: Props) => {
+  const handleChange = (value: string | string[] | boolean | File | null) =>
+    updateField(field.name, value)
 
-const optionInputClass = cn(
-  'flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-2 hover:bg-gray-50',
-)
+  const value = form[field.name]
 
-export function FormField({ field, form, updateField }: Props) {
   switch (field.type) {
     case 'text':
       return (
-        <div className="space-y-2">
-          <label className="block text-sm font-medium">{field.label}</label>
-
-          <input
-            type="text"
-            className={textInputClass}
-            value={form[field.name] as string}
-            onChange={(e) => updateField(field.name, e.target.value)}
-          />
-        </div>
+        <TextField
+          field={field}
+          value={value as string}
+          onChange={handleChange}
+        />
       )
 
     case 'textarea':
       return (
-        <div className="space-y-2">
-          <label className="block text-sm font-medium">{field.label}</label>
-
-          <textarea
-            rows={4}
-            className={textInputClass}
-            value={form[field.name] as string}
-            onChange={(e) => updateField(field.name, e.target.value)}
-          />
-        </div>
+        <TextareaField
+          field={field}
+          value={value as string}
+          onChange={handleChange}
+        />
       )
 
     case 'select':
       return (
-        <div className="space-y-2">
-          <label className="block text-sm font-medium">{field.label}</label>
-
-          <select
-            className={textInputClass}
-            value={form[field.name] as string}
-            onChange={(e) => updateField(field.name, e.target.value)}
-          >
-            <option value="">請選擇</option>
-
-            {field.options.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <SelectField
+          field={field}
+          value={value as string}
+          onChange={handleChange}
+        />
       )
 
     case 'radio':
       return (
-        <div className="space-y-2">
-          <div className="text-sm font-medium">{field.label}</div>
-
-          <div className="flex gap-3">
-            {field.options.map((option) => (
-              <label key={option.value} className={optionInputClass}>
-                <input
-                  type="radio"
-                  name={field.name}
-                  checked={form[field.name] === option.value}
-                  onChange={() => updateField(field.name, option.value)}
-                />
-
-                {option.label}
-              </label>
-            ))}
-          </div>
-        </div>
+        <RadioField
+          field={field}
+          value={value as string}
+          onChange={handleChange}
+        />
       )
 
     case 'checkbox-group':
-      const values = form[field.name] as string[]
       return (
-        <div className="space-y-2">
-          <div className="text-sm font-medium">{field.label}</div>
-
-          <div className="flex flex-wrap gap-3">
-            {field.options.map((option) => (
-              <label key={option.value} className={optionInputClass}>
-                <input
-                  type="checkbox"
-                  checked={values.includes(option.value)}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      updateField(field.name, [...values, option.value])
-                    } else {
-                      updateField(
-                        field.name,
-                        values.filter((item) => item !== option.value),
-                      )
-                    }
-                  }}
-                />
-
-                {option.label}
-              </label>
-            ))}
-          </div>
-        </div>
+        <CheckboxGroupField
+          field={field}
+          value={value as string[]}
+          onChange={handleChange}
+        />
       )
 
     case 'checkbox':
       return (
-        <label className={optionInputClass}>
-          <input
-            type="checkbox"
-            checked={form[field.name] as boolean}
-            onChange={(e) => updateField(field.name, e.target.checked)}
-          />
-
-          {field.label}
-        </label>
+        <CheckboxField
+          field={field}
+          value={value as boolean}
+          onChange={handleChange}
+        />
       )
 
     case 'file':
-      const file = form[field.name] as File | null
       return (
-        <div className="space-y-2">
-          <label className="block text-sm font-medium">{field.label}</label>
-          <FileUpload
-            value={form[field.name] as File | null}
-            onChange={(file) => updateField(field.name, file)}
-          />
-
-          {/* <label className="flex h-36 cursor-pointer items-center justify-center rounded-lg border-2 border-dashed hover:border-blue-500">
-            <input
-              hidden
-              type="file"
-              onChange={(e) =>
-                updateField(field.name, e.target.files?.[0] ?? null)
-              }
-            />
-
-            {file ? file.name : '點擊上傳履歷'}
-          </label> */}
-        </div>
+        <FileField
+          field={field}
+          value={value as File | null}
+          onChange={handleChange}
+        />
       )
 
     default:
+      console.warn(`不支援的欄位類型： ${(field as any).type}`)
       return null
   }
 }

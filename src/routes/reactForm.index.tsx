@@ -1,35 +1,27 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 
 import { submitForm } from '#/server/submit-form'
-import { useForm } from '@/hooks/useForm'
 import { formSteps } from '@/lib/formSteps'
 import { FormField } from '@/components/form/FormField'
-import { FormSummary } from '@/components/form/FormSummary'
+import { useFormContext } from '#/hooks/useFormContext'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-
-export const Route = createFileRoute('/reactFormtwo')({
-  component: RouteComponent,
+export const Route = createFileRoute('/reactForm/')({
+  component: FormPageIndex,
 })
 
-function RouteComponent() {
+function FormPageIndex() {
+  const navigate = useNavigate()
+
+  const { form, updateField } = useFormContext()
+
   const [currentStep, setCurrentStep] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [stepStatus, setStepStatus] = useState<
     Record<number, 'complete' | 'error' | 'idle'>
   >({})
-
-  const [summaryOpen, setSummaryOpen] = useState(false)
-
-  const { form, updateField } = useForm()
 
   const handleSubmit = async () => {
     try {
@@ -62,7 +54,9 @@ function RouteComponent() {
       console.log(result)
 
       if (result.success) {
-        setSummaryOpen(true)
+        navigate({
+          to: '/reactForm/summary',
+        })
       }
     } catch (error) {
       console.error(error)
@@ -73,7 +67,6 @@ function RouteComponent() {
 
   const validateStep = (stepIndex: number) => {
     const fields = formSteps[stepIndex].fields
-
     const newErrors: Record<string, string> = {}
 
     fields.forEach((field) => {
@@ -258,16 +251,6 @@ function RouteComponent() {
           )}
         </div>
       </div>
-
-      <Dialog open={summaryOpen} onOpenChange={setSummaryOpen}>
-        <DialogContent className="max-h-[80vh] max-w-3xl overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>表單送出成功</DialogTitle>
-          </DialogHeader>
-
-          <FormSummary form={form} steps={formSteps} />
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

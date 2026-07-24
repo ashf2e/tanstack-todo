@@ -1,29 +1,8 @@
-// export type FormValue = {
-//   name: string
-//   email: string
-//   gender: string
-
-//   bio: string
-//   country: string
-
-//   skills: string[]
-
-//   agreePrivacy: boolean
-//   agreeTerms: boolean
-//   subscribe: boolean
-
-//   resume: File | null
-// }
-
 export type Option = {
   label: string
   value: string
 }
 
-// type BaseField = {
-//   name: keyof FormValue
-//   label: string
-// }
 type BaseField = {
   name: string
   label: string

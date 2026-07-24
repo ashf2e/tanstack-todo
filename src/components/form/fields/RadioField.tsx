@@ -23,6 +23,7 @@ export const RadioField = ({ field, value, onChange }: Props) => {
               checked={value === option.value}
               onChange={(e) => onChange(e.target.value)}
             />
+            {option.label}
           </label>
         ))}
       </div>
